@@ -21,13 +21,12 @@ Distributed outdoor RGB LED garden lighting system. RP2040 Picos drive WS2815 LE
 
 ### Conduit runs to hub box (pull all three while trench is open)
 - **Cat6 #1** — PoE camera #1 (dedicated, direct to camera)
-- **Cat6 #2** — Pi Zero 2 W network (via USB-ethernet adapter); reserved for future PoE camera #2. When second camera is added, insert a small PoE-aware switch at the box end — no rewiring needed.
+- **Cat6 #2** — Pi Zero 2 W network (via USB Hub + Ethernet HAT's RJ45 port); reserved for future PoE camera #2. When second camera is added, insert a small PoE-aware switch at the box end — no rewiring needed.
 - **12/2 landscape wire** — 24V/300W power feed
 
 ### Hub box contents
 - Raspberry Pi Zero 2 W
-- 1× USB-OTG hub (connects to Pi's single micro-USB OTG port; provides ports for ethernet adapter + Pico USB hub)
-- 1× USB-ethernet adapter (connects Pi to Cat6 #2)
+- 1× Pi Zero USB Hub + Ethernet HAT (RTL8152B-based; RJ45 + 3× USB-A; stacks on GPIO header, taps Pi's USB via pogo pins, powered from GPIO 5V; RJ45 connects to Cat6 #2, one USB-A port feeds the powered USB hub)
 - 4–8× RP2040 Pico (standard, not Pico W)
 - 1× powered USB hub (7+ port, for Picos)
 - 1× 24V→5V buck converter, 5A rated (Pi, Picos, USB hub)
@@ -137,3 +136,82 @@ Run `udevadm info -a -n /dev/ttyACM0 | grep serial` to find each Pico's serial n
 - The Pi bridge must handle serial port enumeration gracefully at startup — Picos may not all be ready simultaneously on boot.
 - Data splices underground will cause signal integrity problems. Data connections must only occur at fixture PCB pins, never mid-cable.
 - Raspberry Pi OS Bookworm (Debian 12) on the Zero 2 W is assumed — verify systemd unit file syntax and pip behavior against actual OS version. Use the 32-bit Raspberry Pi OS Lite image for the Zero 2 W (lighter footprint, no desktop needed).
+
+# Globe Cradle Project
+
+## Project Overview
+
+Spherical cradle mount for a 59mm globe in FreeCAD 1.1.1.
+Cups the bottom 1/8 of the globe with a bottom nipple for a
+1/4" ID / 3/8" OD tube (glued slip fit).
+
+## FreeCAD Version
+
+- FreeCAD 1.1.1 (stable, April 2026)
+- Workbench: Part (not Part Design)
+- Platform: macOS
+
+## Key Design Decisions
+
+### Why Part Workbench (not Part Design)
+Part Design revolution requires sketches entirely on one side of the
+revolution axis. The spherical profile crosses the axis causing errors.
+Part workbench boolean approach avoids this entirely.
+
+### Construction Order (Critical)
+1. Cut inner sphere from outer sphere FIRST (hollow shell)
+2. Cut box from shell SECOND (crops to cradle shape)
+3. Union nipple cylinder THIRD
+4. Cut bore cylinder LAST
+
+### Mac-Specific Notes
+- Boolean operations: Click first object, Cmd+click second object
+- Union: Part > Boolean > Union (not "Fuse")
+- Cut: Part > Boolean > Cut
+- TechDraw projection group centering via Python console:
+  group.X = page.PageWidth / 2
+  group.Y = page.PageHeight / 2
+
+## Critical Dimensions
+
+| Parameter           | Value    | Notes                     |
+|---------------------|----------|---------------------------|
+| Globe radius        | 29.5mm   | Must match actual globe   |
+| Inner cup radius    | 29.5mm   | Exact fit to globe        |
+| Outer cup radius    | 32mm     | 2.5mm wall thickness      |
+| Nipple bore radius  | 4.86mm   | Slip fit for 3/8" OD tube |
+| Nipple outer radius | 7.36mm   | 2.5mm wall around bore    |
+| Bore depth          | 15mm     | Glue surface area         |
+| Nipple length       | 20mm     | Total nipple protrusion   |
+| Box crop Z          | -22.1mm  | Sets cradle depth         |
+
+## Known Issues / Gotchas
+
+- TechDraw Projection Group X/Y properties do not update via Properties
+  panel — use Python console instead
+- Boolean Cut greyed out if objects are not proper closed solids
+- Use full sphere primitives (default angles) for boolean operations
+- Print preview print button nearly invisible on Mac
+- Use File > Print > Save as PDF (not File > Export > PDF) for 1:1 scale
+
+## Modifying the Design
+
+### To change globe size:
+1. Outer sphere radius = new_globe_radius + 2.5mm
+2. Inner sphere radius = new_globe_radius
+3. Box crop Z = -(new_globe_radius) + (new_globe_diameter / 8)
+4. Update README dimensions table
+
+### To change tube size:
+1. Nipple bore radius = (tube_OD / 2) + 0.1mm glue clearance
+2. Nipple outer radius = nipple_bore_radius + 2.5mm
+
+## FreeCAD Shortcuts (Mac)
+
+| Action              | Shortcut        |
+|---------------------|-----------------|
+| Fit all in view     | V then F        |
+| Fit selection       | V then S        |
+| Undo                | Cmd+Z           |
+| Boolean second obj  | Cmd+click       |
+| Python console      | View > Panels   |
