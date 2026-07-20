@@ -77,6 +77,8 @@ garden/lights/scene/set         # activate a named scene
 pico/main.py          — MicroPython entry point, serial listener, effect dispatcher
 pico/effects.py       — Effect implementations (solid, cycle, chase, scene, off)
 pico/ws2811.py        — WS2811 driver (NeoPixel-compatible; do not modify)
+pico/test_bench.py    — Bench-test-stage smoke test (2 LEDs, no serial protocol)
+pico/README.md        — MicroPython flashing + bench-test-stage setup guide
 pi/bridge.py          — asyncio MQTT↔serial bridge
 pi/config.py          — Zone→serial port mapping, MQTT broker address, topic prefixes
 pi/requirements.txt   — aiomqtt, pyserial-asyncio
