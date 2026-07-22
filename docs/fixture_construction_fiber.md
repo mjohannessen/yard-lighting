@@ -90,7 +90,11 @@ electrically.
   outdoors for years, but the Kobra's open frame makes ASA's warping and
   fumes impractical to manage without a DIY enclosure, so final parts are
   outsourced rather than printed locally
-- Fine sandpaper (400–600 grit) or matte-finish spray, for fiber tip prep
+- Fine sandpaper (400–600 grit) or matte-finish spray, for the globe-end fiber
+  tip (frosted, diffusing)
+- Fine sandpaper set (400/600/1000/1500/2000 grit) + metal- or plastic-polish
+  compound (Brasso, Novus 2/1) or a small flame source, for the base-end fiber
+  face (clear, flat, polished — opposite finish from the globe end)
 - Wire cutters rated for stainless spring wire
 - Soldering iron, fine tip; heat-shrink + heat gun for node lead splices
 - Crimper matched to the chosen connector
@@ -122,9 +126,33 @@ Secure the spring wire's base end in its anchor socket — this joint must be
 rigid; any flex here is lost from the stem's usable spring length.
 
 ### Step 5 — Cut and seat the fiber
-Cut the fiber to stem length plus a short service loop. Clean/polish the base
-end and seat it at the cone's small end with as small an air gap as possible —
+Cut the fiber to stem length plus a short service loop. Polish the base end,
+then seat it at the cone's small end with as small an air gap as possible —
 any gap here is light that misses the fiber entirely.
+
+**Polishing the base (input) end face** — this end must stay clear and flat,
+the opposite treatment from the frosted globe-end tip in Step 6:
+
+1. Score and snap, or cut square with a sharp blade/fiber-optic cutting tool,
+   as close to perpendicular to the fiber axis as you can get by eye.
+2. Wet-sand the end face flat against fine sandpaper on a hard, flat surface
+   (a scrap of glass or tile works), fiber held perpendicular to the paper.
+   Step through grits: ~400 → 600 → 1000 → 1500 → 2000, a few figure-eight
+   strokes per grit, wiping the face clean between grits so a coarser
+   scratch doesn't carry forward.
+3. Finish with a metal-polish compound (e.g. Brasso) on a soft cloth or
+   felt pad, or a plastic-polish compound (e.g. Novus 2/1), until the face
+   looks clear rather than frosted — held up to light, you should see
+   through it, not a matte scatter.
+4. Optional, PMMA-specific alternative to steps 2–3: pass the cut end
+   briefly through a small flame (lighter/alcohol lamp) to flame-polish it —
+   PMMA melts and self-levels to an optically clear face in about a second
+   of exposure. Fast but easy to overdo: too long scorches/discolors the
+   fiber or rounds the face, killing the flat coupling surface. Sand/polish
+   by hand instead if you don't trust your control on the first attempt.
+5. Inspect the finished face against a light source: it should be flat,
+   perpendicular, and glassy-clear with no visible scratches, chips, or
+   rounding at the edge before seating it at the cone.
 
 ### Step 6 — Prep the globe-end fiber tip
 Sand or matte-spray the fiber's globe-end tip, then epoxy the diffuser bead on
