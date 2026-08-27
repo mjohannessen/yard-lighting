@@ -4,17 +4,17 @@ This file provides context for Claude Code sessions on this project. Read it ful
 
 ## Project Purpose
 
-Distributed outdoor RGB LED garden lighting system. RP2040 Picos drive WS2811 fixture nodes via daisy-chained underground 3-wire trunk cable runs. Each fixture is a buried base enclosure (WS2811 node + reflector cone) feeding a passive fiber-optic + spring-wire stem up to a frosted globe — no electrical connection above the base enclosure. See [docs/fixture_construction_fiber.md](docs/fixture_construction_fiber.md) for the full fixture build. A Raspberry Pi Zero 2 W bridges MQTT (from openHAB on a Mac Mini) to USB serial commands for each Pico. All control hardware is co-located in a weatherproof hub box in the garden.
+Distributed outdoor RGB LED garden lighting system. RP2350 Picos (Pico 2) drive WS2815 fixture nodes (wired single-line, WS2811-style — the chip's backup data feature is unused) via daisy-chained underground 3-wire trunk cable runs. Each fixture is a buried base enclosure (WS2815 node + direct-contact fiber pocket) feeding a passive fiber-optic + spring-wire stem up to a frosted globe — no electrical connection above the base enclosure. See [docs/fixture_construction_fiber.md](docs/fixture_construction_fiber.md) for the full fixture build. A Raspberry Pi Zero 2 W bridges MQTT (from openHAB on a Mac Mini) to USB serial commands for each Pico. All control hardware is co-located in a weatherproof hub box in the garden.
 
 ## Architecture Constraints — Do Not Change Without Discussion
 
-- **One Pico per zone.** Each Pico drives exactly one daisy-chained WS2811 node string. Do not attempt to drive multiple strings from one Pico.
+- **One Pico per zone.** Each Pico drives exactly one daisy-chained WS2815 node string (wired as a plain single-line chain — backup data feature unused). Do not attempt to drive multiple strings from one Pico.
 - **USB serial only** for Pi↔Pico communication. No WiFi, no RS-485. Picos are co-located with the Pi inside the hub box.
 - **MicroPython on Picos.** Do not suggest CircuitPython or C SDK unless there is a hard performance reason.
 - **Python asyncio on Pi.** The bridge script uses `aiomqtt` and `pyserial-asyncio`. Do not introduce threading or synchronous serial blocking calls.
 - **Two buck converters.** 24V→5V for Pi Zero 2 W/Picos, 24V→12V for LED strings. Do not assume a single shared voltage bus for both.
-- **74AHCT125 level shifter** on every Pico data line. Pico outputs 3.3V; WS2811 DIN requires 5V logic. Never connect GP0 directly to a string without the shifter.
-- **WS2811 LED protocol.** WS2811 is wire-compatible with WS2812B/WS2815 (same single-wire protocol) but operates at 12V and has **no backup data line** — unlike WS2815, there is no DOUT. Each node fully decodes and regenerates the signal, so trunk-in-data and trunk-out-data are separate electrical nets at every fixture, not a shared bus. The MicroPython NeoPixel library works with WS2811. Do not reference WS2812B specs for voltage or current draw.
+- **74AHCT125 level shifter** on every Pico data line. Pico outputs 3.3V; WS2815 DI requires 5V logic. Never connect GP0 directly to a string without the shifter.
+- **WS2815 LED chip, used single-line (WS2811-style).** Fixtures use WS2815 5050 SMD individually-addressable LEDs (12V, driver integrated per LED — see [docs/fixture_construction_fiber.md](docs/fixture_construction_fiber.md) BOM for the sourced part) rather than the earlier WS2811 pixel nodes: WS2815's flat SMD package lets the fiber tip seat flush against the emitter face for direct-contact coupling, where a domed WS2811 node's curved lens only touched the fiber at one point. WS2815 exposes a BI/BO backup-data pair for its "breakpoint resume" redundancy feature — **this project does not use it.** Only DI/DO are wired, exactly like WS2811's DIN/DOUT; BI/BO are left unconnected at every node. This keeps the 3-conductor trunk, the two-separate-nets data-splice convention, and the original failure mode (one dead node breaks the chain downstream) unchanged — the chip changed, the wiring convention and its trade-offs did not. The MicroPython NeoPixel library works with WS2815 run this way; verify timing against `pico/ws2811.py` on the bench before field deployment. Do not reference WS2812B specs for voltage or current draw.
 - **openHAB is the authority** for schedules, scenes, and automation logic. Keep intelligence in openHAB rules, not in the Pi bridge script. The bridge is a dumb forwarder.
 
 ## Hardware
@@ -27,19 +27,19 @@ Distributed outdoor RGB LED garden lighting system. RP2040 Picos drive WS2811 fi
 ### Hub box contents
 - Raspberry Pi Zero 2 W
 - 1× Pi Zero USB Hub + Ethernet HAT (RTL8152B-based; RJ45 + 3× USB-A; stacks on GPIO header, taps Pi's USB via pogo pins, powered from GPIO 5V; RJ45 connects to Cat6 #2, one USB-A port feeds the powered USB hub)
-- 4–8× RP2040 Pico (standard, not Pico W)
+- 4–8× RP2350 Pico 2 (standard, not Pico 2 W)
 - 1× powered USB hub (7+ port, for Picos)
 - 1× 24V→5V buck converter, 5A rated (Pi, Picos, USB hub)
-- 1× 24V→12V buck converter, 5A rated (all WS2811 fixture strings)
+- 1× 24V→12V buck converter, 5A rated (all WS2815 fixture strings)
 - 2× 74AHCT125 quad level shifter (one chip per two zones, covers up to 8 zones)
 
 ### Underground trunk cable per zone (daisy-chain, base enclosure to base enclosure)
 - 12V power
 - GND
-- Data (single wire — WS2811 has no backup/DOUT line, unlike WS2815)
+- Data (single wire — WS2815's BI/BO backup pair is intentionally left unwired; treated as a plain single-line chain, same as WS2811)
 - 3 conductors total, no backup line
-- Spliced only inside each fixture's base enclosure, on reusable lever nuts (e.g. Wago 221): 12V and GND get a common-tie lever (trunk-in + trunk-out + node lead); data gets **two separate levers** (trunk-in→node DIN, node DOUT→trunk-out) since the node regenerates the signal — never tie all four data leads into one lever
-- No inline splices mid-cable — data and power both land only at a base enclosure's levers
+- Spliced only inside each fixture's base enclosure, on gel-filled direct-bury connectors — ZONE INDUSTRY CORP silicone-filled waterproof wire nuts, UL 486G, 20–8 AWG (final pick, per docs/fixture_construction_fiber.md §2 BOM): 12V and GND get a common-tie connector (trunk-in + trunk-out + node lead); data gets **two separate connectors** (trunk-in→node DIN, node DOUT→trunk-out) since the node regenerates the signal — never tie all four data leads into one connector. This is a permanent splice, not a field disconnect — swapping a fixture means cutting and re-splicing, not unplugging. Deliberate trade-off, confirmed with the user 2026-08-27: field swaps are expected to be rare, so each fixture gets a coiled service loop of extra trunk cable to allow a future cut/re-splice without pulling new wire.
+- No inline splices mid-cable — data and power both land only at a base enclosure's gel-filled connectors
 - Full convention: [docs/fixture_construction_fiber.md](docs/fixture_construction_fiber.md) §5
 
 ### Per zone (in hub box)
@@ -48,7 +48,7 @@ Distributed outdoor RGB LED garden lighting system. RP2040 Picos drive WS2811 fi
 - IP67/IP68 3-pin weatherproof connector at hub box exit
 
 ### Pico pin assignments
-- **GP0** — WS2811 data out (to 74AHCT125 input)
+- **GP0** — WS2815 data out (to 74AHCT125 input)
 - **VBUS** — 5V in from USB
 - **GND** — common ground
 
@@ -76,7 +76,7 @@ garden/lights/scene/set         # activate a named scene
 ```
 pico/main.py          — MicroPython entry point, serial listener, effect dispatcher
 pico/effects.py       — Effect implementations (solid, cycle, chase, scene, off)
-pico/ws2811.py        — WS2811 driver (NeoPixel-compatible; do not modify)
+pico/ws2811.py        — NeoPixel-protocol driver, used for WS2815 in single-line mode (do not modify)
 pico/test_bench.py    — Bench-test-stage smoke test (2 LEDs, no serial protocol)
 pico/README.md        — MicroPython flashing + bench-test-stage setup guide
 pi/bridge.py          — asyncio MQTT↔serial bridge
@@ -86,7 +86,7 @@ openhab/garden_lights.items
 openhab/garden_lights.rules
 openhab/garden_lights.sitemap
 docs/wiring.md                       — Bench-test-stage vs field-deployment wiring reference
-docs/fixture_construction_fiber.md   — Fixture head build guide: base enclosure, WS2811 node, fiber/spring-wire stem, globe
+docs/fixture_construction_fiber.md   — Fixture head build guide: base enclosure, WS2815 node, fiber/spring-wire stem, globe
 docs/bom.md                          — Bill of materials with sourcing notes
 ```
 
@@ -133,12 +133,12 @@ Run `udevadm info -a -n /dev/ttyACM0 | grep serial` to find each Pico's serial n
 
 ## Known Constraints & Watch-outs
 
-- WS2811 data line is timing-sensitive. Keep the serial→LED dispatch loop tight on the Pico — avoid anything slow between receiving a command and writing to the string.
+- WS2815 data line is timing-sensitive. Keep the serial→LED dispatch loop tight on the Pico — avoid anything slow between receiving a command and writing to the string.
 - Do not drive the data line from the Pico's GP0 directly — always through the 74AHCT125.
 - The 100µF cap at the first base enclosure's node leads is not optional — omitting it risks destroying the first node on power-on surge.
-- WS2811 has no backup data line — a single node failure breaks data regeneration to every fixture downstream of it in that zone until it's swapped. Design effects to stay well under full white in normal use to manage node heat and PSU headroom.
+- WS2815's BI/BO backup data line is intentionally left unwired (see Architecture Constraints) — so, same as plain WS2811, a single node failure still breaks data regeneration to every fixture downstream of it in that zone until it's swapped. Design effects to stay well under full white in normal use to manage node heat and PSU headroom.
 - The Pi bridge must handle serial port enumeration gracefully at startup — Picos may not all be ready simultaneously on boot.
-- Data splices underground will cause signal integrity problems. Data connections must only occur at a node's own pads or a lever nut inside a base enclosure, never mid-cable.
+- Data splices underground will cause signal integrity problems. Data connections must only occur at a node's own pads or a gel-filled direct-bury connector inside a base enclosure, never mid-cable.
 - Raspberry Pi OS Bookworm (Debian 12) on the Zero 2 W is assumed — verify systemd unit file syntax and pip behavior against actual OS version. Use the 32-bit Raspberry Pi OS Lite image for the Zero 2 W (lighter footprint, no desktop needed).
 
 # Globe Cradle Project
