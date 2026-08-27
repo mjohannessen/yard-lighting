@@ -7,9 +7,12 @@ the bench-test-stage vs. field-deployment wiring context.
 
 ## 0. Identify the board before flashing
 
-CLAUDE.md specifies RP2040 Pico (standard, not Pico W) as the architecture
+- Pi zero is at 192.168.1.120
+
+CLAUDE.md specifies RP2350 Pico 2 (standard, not Pico 2 W) as the architecture
 constraint, but **confirm the actual chip on each board** before flashing —
-don't assume. Put the Pico in BOOTSEL mode (see step 2) and check:
+don't assume, since earlier boards bought before the fleet standardized may
+still be RP2040. Put the Pico in BOOTSEL mode (see step 2) and check:
 
 ```bash
 dmesg | tail -20
