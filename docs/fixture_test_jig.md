@@ -69,12 +69,12 @@ looks identical to a disconnected data line (LEDs just stay dark).
 With the Pico connected via USB to the Pi test host, flash
 [pico/test_bench.py](../pico/test_bench.py) using `mpremote` from the Pi
 per [pico/README.md](../pico/README.md) §§1–3, then follow that guide's
-REPL steps and enter `1` at the **Number of LEDs** prompt (this jig drives
-one node at a time). Its normal cycling behavior (red → green → blue →
-white → off) is what §6's QC checklist checks color uniformity and
-hot-spot issues against — if a solid-color diagnostic variant is in place
-instead (swapped in during hardware troubleshooting), restore the cycling
-version before using the jig for fixture QC.
+REPL steps and enter `1` at the **Number of LEDs** prompt when testing one
+fixture on this jig (it also accepts the full daisy-chained count when
+testing a multi-fixture run). It then drives a rotating rainbow across all
+configured LEDs — each position gets a distinct, continuously shifting hue
+— which is what §6's QC checklist checks color uniformity and hot-spot
+issues against.
 
 ## Using the jig
 
@@ -83,11 +83,11 @@ version before using the jig for fixture QC.
    (never the out-pigtail/DO).
 3. Enable the bench PSU output.
 4. From the Pi test host, confirm the Pico is running `test_bench.py` and
-   showing the color cycle (see [pico/README.md](../pico/README.md) §3 for
+   showing the rainbow (see [pico/README.md](../pico/README.md) §3 for
    the `mpremote`/REPL steps).
 5. At the globe, check per
    [fixture_construction_fiber.md](fixture_construction_fiber.md) §6: color
-   uniformity through the cycle, no hot-spot opposite the fiber tip,
+   uniformity through the rainbow, no hot-spot opposite the fiber tip,
    adequate brightness, and — if the stem is already built — that hand-flexing
    the stem doesn't disturb the light (a loose LED-to-fiber contact would
    show up as flicker here).

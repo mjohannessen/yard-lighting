@@ -80,8 +80,15 @@ python3 -m pip install --user --break-system-packages mpremote
 ## 3. Deploy and run the bench test
 
 ```bash
-mpremote connect /dev/ttyACM0 cp ~/test_bench.py :main.py
+cd ~/Documents/yard-lighting
+git pull
+mpremote connect /dev/ttyACM0 cp pico/test_bench.py :main.py
 mpremote connect /dev/ttyACM0 repl
+[enter]
+[>>>]
+CTRL-D
+[enter number of leds]
+
 ```
 
 Copying to `:main.py` makes it run on every boot/reset — but copying alone
@@ -95,8 +102,10 @@ Number of LEDs:
 
 Type the count of NeoPixels currently wired on GP0 (e.g. `1` when
 isolating a single fixture on the test jig) and press Enter. It then
-drives the color sequence red → green → blue → white → off, repeating
-every ~5s, to confirm the signal path end to end.
+drives a rotating rainbow across all of them — each LED position gets a
+distinct hue, and the pattern shifts continuously — to confirm the signal
+path end to end. With a single LED it just sweeps that one fixture through
+the full color wheel.
 
 To disconnect the REPL without resetting the board, press **Ctrl-]**. To
 re-run with a different LED count, reconnect (`mpremote connect
