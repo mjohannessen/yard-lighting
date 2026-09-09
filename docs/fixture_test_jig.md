@@ -60,6 +60,15 @@ one is 12V and the other is 5V-over-USB), run a wire between their two
 negative/ground points — don't assume they share a ground just because both
 eventually reach the same fixture.
 
+**Confirmed failure mode:** a missing/floating common ground here doesn't
+just leave the node dark — it produces a *wrong but plausible-looking*
+color (e.g. commanding solid white and getting solid green or blue
+instead, differently on different runs of the same script), because the
+node has no shared zero-volt reference to judge the incoming signal's
+high/low thresholds against. Check continuity between the bench PSU's
+negative terminal and the Pico's GND pin (should read ~0V) before
+suspecting the resistor, cap, clips, or the node itself.
+
 **1OE must be tied to GND**, not left floating — see
 [pico/README.md](../pico/README.md) §4 for why a floating output-enable
 looks identical to a disconnected data line (LEDs just stay dark).

@@ -149,3 +149,12 @@ four channels on the chip.
   hold for ~2s after, then release.
 - **Script runs but LEDs stay dark** — check GP0 → 74AHCT125 pin 2, and
   confirm pin 1 (1OE) is tied to GND, not floating.
+- **LED shows a wrong color instead of the one commanded** (e.g. solid
+  white comes out green or blue, and it's a *different* wrong color on a
+  different run of the same script) — check that the LED's power supply
+  ground and the Pico/74AHCT125 ground are actually tied together, not
+  just both eventually routed to the same fixture. Without a common
+  ground the node has no shared reference for the data signal's high/low
+  thresholds, so it latches whatever crosses threshold rather than the
+  intended value — confirmed root cause on the bench jig, see
+  [docs/fixture_test_jig.md](../docs/fixture_test_jig.md).
