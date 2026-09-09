@@ -81,20 +81,33 @@ python3 -m pip install --user --break-system-packages mpremote
 
 ```bash
 mpremote connect /dev/ttyACM0 cp ~/test_bench.py :main.py
-mpremote connect /dev/ttyACM0 reset
+mpremote connect /dev/ttyACM0 repl
 ```
 
-Copying to `:main.py` makes it auto-run on every boot/reset — no serial
-session needs to stay open. `test_bench.py` drives 2 NeoPixels on GP0
-through the color sequence red → green → blue → white → off, repeating
+Copying to `:main.py` makes it run on every boot/reset — but copying alone
+doesn't trigger that reset, so after `repl` connects you'll just see a
+blank prompt. Press **Ctrl-D** to soft-reset the board; that runs
+`main.py`, which immediately prints:
+
+```
+Number of LEDs:
+```
+
+Type the count of NeoPixels currently wired on GP0 (e.g. `1` when
+isolating a single fixture on the test jig) and press Enter. It then
+drives the color sequence red → green → blue → white → off, repeating
 every ~5s, to confirm the signal path end to end.
+
+To disconnect the REPL without resetting the board, press **Ctrl-]**. To
+re-run with a different LED count, reconnect (`mpremote connect
+/dev/ttyACM0 repl`) and press Ctrl-D again.
 
 ## 4. 74AHCT125 wiring (bench test / single zone)
 
 The 74AHCT125 is a quad buffer — 4 independent channels, each with an input
-(`nA`), output (`nY`), and an **active-low** output-enable (`nOE`). CLAUDE.md
-uses one chip per two zones (up to 4 zones per chip, 8 zones across 2 chips);
-for a single-zone bench test, channel 1 is enough.
+(`nA`), output (`nY`), and an **active-low** output-enable (`nOE`). CLAUDE.md's
+build uses a single chip, all 4 channels, one per zone (the project is capped
+at 4 zones); for a single-zone bench test, channel 1 is enough.
 
 DIP-14 SN74AHCT125N pinout, channel 1:
 

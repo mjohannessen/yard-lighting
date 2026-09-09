@@ -29,20 +29,38 @@ riser and no electrical connection above the base enclosure.
                      │  MQTT↔serial bridge  │
                      └──────────┬───────────┘
                                 │ USB (Hub+Ethernet HAT → powered USB hub)
-                ┌───────────────┼───────────────┐
-                ▼               ▼               ▼
-           ┌─────────┐    ┌─────────┐      ┌─────────┐
-           │ Pico #1 │    │ Pico #2 │  ...  │ Pico #n │
-           │ Zone 1  │    │ Zone 2  │       │ Zone n  │
-           └────┬────┘    └────┬────┘       └────┬────┘
-                │ GP0          │                 │
-                ▼              ▼                 ▼
-          74AHCT125      74AHCT125          74AHCT125
-        level shifter  level shifter      level shifter
-                │              │                 │
-                ▼              ▼                 ▼
-      underground trunk cable, base enclosure to base enclosure
-              (12V · GND · Data — 3 conductors, no backup line)
+          ┌─────────────┬─────────────┬─────────────┐
+          ▼             ▼             ▼             ▼
+     ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐
+     │ Pico #1 │   │ Pico #2 │   │ Pico #3 │   │ Pico #4 │
+     │ Zone 1  │   │ Zone 2  │   │ Zone 3  │   │ Zone 4  │
+     └────┬────┘   └────┬────┘   └────┬────┘   └────┬────┘
+          │ GP0         │ GP0         │ GP0         │ GP0
+          ▼             ▼             ▼             ▼
+     ┌───────────────────────────────────────────────────┐
+     │       74AHCT125 — one chip, 4 channels             │
+     │   (single quad level shifter; all 4 Picos share    │
+     │            it, one channel per zone)                │
+     └────┬────────────┬────────────┬────────────┬────────┘
+          ▼             ▼             ▼             ▼
+      300–470Ω      300–470Ω      300–470Ω      300–470Ω
+      resistor on   resistor on   resistor on   resistor on
+      zone 1 data   zone 2 data   zone 3 data   zone 4 data
+      lead, at      lead, at      lead, at      lead, at
+      chip output   chip output   chip output   chip output
+          │             │             │             │
+          ▼             ▼             ▼             ▼
+      trunk cable,  trunk cable,  trunk cable,  trunk cable,
+      zone 1        zone 2        zone 3        zone 4
+      (12V·GND·Data, base enclosure to base enclosure)
+          │             │             │             │
+          ▼             ▼             ▼             ▼
+      1st fixture,  1st fixture,  1st fixture,  1st fixture,
+      zone 1:       zone 2:       zone 3:       zone 4:
+      +100µF cap    +100µF cap    +100µF cap    +100µF cap
+      across        across        across        across
+      12V/GND at    12V/GND at    12V/GND at    12V/GND at
+      node's leads  node's leads  node's leads  node's leads
 ```
 
 ### Per-fixture base enclosure wiring
@@ -89,6 +107,7 @@ fixture allows a future cut/re-splice without pulling new wire.
 ```
 
 Notes:
+- Mark fixtures with one small hole on the DIN side, 2 holes indicate the first fixture in the node which has the capacitor between + and -
 - **12V and GND** are a true common tie — one gel-filled connector each,
   with trunk-in, trunk-out, and the node's own pigtail lead all landed
   together.
@@ -110,3 +129,9 @@ Notes:
 | 12V    | Common-tie gel-filled direct-bury connector, outside the base enclosure |
 | GND    | Common-tie gel-filled direct-bury connector, outside the base enclosure |
 | Data   | Two separate gel-filled connectors (in→DI, DO→out) — never a common tie, never mid-cable |
+
+## 3D-printed parts
+
+The globe cradle and base enclosure are designed in FreeCAD; part specs,
+dimensions, and construction steps are in [freecad.md](freecad.md).
+Sources (`.FCStd`) and exported print files live in [freecad/](freecad/).

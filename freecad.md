@@ -23,8 +23,44 @@ superseding the glued fit this part originally shipped with).
 
 ## Files
 
-- `globe_cradle.FCStd` — FreeCAD 1.1.1 source file
-- `globe_cradle.stl`  — STL export for 3D printing
+- `models/light-cradle-top-refined.3mf` — current printable export (FreeCAD-generated mesh); this is the file actually in the repo and the one that's been printed and fit-tested
+- No `.FCStd` source is currently checked into this repo — if it lives only in a local FreeCAD session or another location, add it here so the mesh isn't the only copy
+
+## Suppliers
+
+- Globe: https://www.superiorlighting.com/6-inch-plastic-globe-plain-lip-opening-white-opal-acrylic/
+
+## As-built vs. this doc (2026-09-02)
+
+Measured directly from `models/light-cradle-top-refined.3mf`'s mesh (2051 vertices /
+4102 triangles), since no `.FCStd` source is in-repo to check against:
+
+- **Globe stays 59mm** — confirmed with the user 2026-09-02, not changing.
+- **Cup/rim diameter checks out.** The spec table's "outer radius (cup) 32mm" is the
+  *sphere primitive's* radius used in the boolean construction (Construction Method
+  step 1), not the finished rim's opening size — those are different numbers by
+  design, and the table didn't distinguish them. For a 1/8-height cap of a 59mm
+  globe, the rim opening's actual radius works out to ≈19.5mm (`sqrt(R² - (R-h)²)`
+  with R=29.5mm, h=7.4mm), i.e. ≈39mm diameter — and the mesh measures a 40mm
+  overall diameter at that rim. These agree; no design change here, just a doc
+  ambiguity worth this note so it doesn't get mis-read as a mismatch again.
+- **Nipple bore does not match this doc's spec, and this one is unresolved.** The
+  doc specifies a 4.5mm bore radius (9mm diameter) sized for an interference press-fit
+  against the 9.525mm-OD tube (see the Nipple bore radius row and the note below the
+  spec table). The mesh's nipple, however, has a ~2.8mm-diameter (r≈1.4mm) center
+  bore through most of its ~19mm length — sized like the *fiber-only* hole from the
+  LED holder insert in
+  [docs/fixture_construction_fiber.md](docs/fixture_construction_fiber.md) §1, not a
+  tube-interference bore. The nipple's outer shaft also reads ~9.6mm OD (close to the
+  tube's own 9.525mm OD), with a wider collar near the cup and a small flange at the
+  tip. A triangle mesh doesn't preserve feature intent, so this could be: (a) the tube
+  design changed to slide over the nipple rather than press into a bore, with the fiber
+  routed through a separate small channel, or (b) this file is genuinely a different
+  part (closer to the LED holder insert) that inherited the "cradle" name. Since the
+  user has printed and fit-confirmed the current cradles, whichever it is clearly
+  works — but the written spec below (Nipple bore radius, and the interference-fit
+  note) is stale relative to the actual file and should be corrected once the intent
+  is confirmed against the `.FCStd` source rather than the exported mesh.
 
 ## Construction Method
 

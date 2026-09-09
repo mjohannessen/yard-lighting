@@ -27,11 +27,11 @@ Distributed outdoor RGB LED garden lighting system. RP2350 Picos (Pico 2) drive 
 ### Hub box contents
 - Raspberry Pi Zero 2 W
 - 1× Pi Zero USB Hub + Ethernet HAT (RTL8152B-based; RJ45 + 3× USB-A; stacks on GPIO header, taps Pi's USB via pogo pins, powered from GPIO 5V; RJ45 connects to Cat6 #2, one USB-A port feeds the powered USB hub)
-- 4–8× RP2350 Pico 2 (standard, not Pico 2 W)
-- 1× powered USB hub (7+ port, for Picos)
+- 4× RP2350 Pico 2 (standard, not Pico 2 W)
+- 1× powered USB hub (4-port, for Picos) — project is capped at 4 zones permanently due to hub box space constraints, confirmed with the user 2026-08-29; not a phase-1 placeholder
 - 1× 24V→5V buck converter, 5A rated (Pi, Picos, USB hub)
 - 1× 24V→12V buck converter, 5A rated (all WS2815 fixture strings)
-- 2× 74AHCT125 quad level shifter (one chip per two zones, covers up to 8 zones)
+- 1× 74AHCT125 quad level shifter (all 4 channels used, one per zone)
 
 ### Underground trunk cable per zone (daisy-chain, base enclosure to base enclosure)
 - 12V power
@@ -55,7 +55,7 @@ Distributed outdoor RGB LED garden lighting system. RP2350 Picos (Pico 2) drive 
 ## MQTT Topics
 
 ```
-garden/lights/zone/{n}/set      # command a specific zone (n = 1–8)
+garden/lights/zone/{n}/set      # command a specific zone (n = 1–4)
 garden/lights/zone/{n}/status   # zone heartbeat / status
 garden/lights/all/set           # broadcast command to all zones
 garden/lights/scene/set         # activate a named scene
@@ -87,7 +87,10 @@ openhab/garden_lights.rules
 openhab/garden_lights.sitemap
 docs/wiring.md                       — Bench-test-stage vs field-deployment wiring reference
 docs/fixture_construction_fiber.md   — Fixture head build guide: base enclosure, WS2815 node, fiber/spring-wire stem, globe
+docs/fixture_test_jig.md             — Pre-burial per-fixture bench test rig: clip leads onto pigtails before splicing/closing
 docs/bom.md                          — Bill of materials with sourcing notes
+freecad.md                           — Globe cradle + base housing part specs, dimensions, construction steps, as-built notes
+freecad/                             — FreeCAD sources (.FCStd), drafts/, and exported .3mf print files — see "FreeCAD Design Files" below
 ```
 
 ## Coding Conventions
@@ -141,76 +144,52 @@ Run `udevadm info -a -n /dev/ttyACM0 | grep serial` to find each Pico's serial n
 - Data splices underground will cause signal integrity problems. Data connections must only occur at a node's own pads or a gel-filled direct-bury connector inside a base enclosure, never mid-cable.
 - Raspberry Pi OS Bookworm (Debian 12) on the Zero 2 W is assumed — verify systemd unit file syntax and pip behavior against actual OS version. Use the 32-bit Raspberry Pi OS Lite image for the Zero 2 W (lighter footprint, no desktop needed).
 
-# Globe Cradle Project
+# FreeCAD Design Files
 
-## Project Overview
+CAD sources for the project's 3D-printed parts (globe cradle, base
+enclosure, LED mount inserts) live in `freecad/`. Part-specific
+overviews, dimensions, construction steps, printing notes, and as-built
+status live in [freecad.md](freecad.md) — that file is the source of
+truth for individual parts; update it, not this section, when a part's
+design changes.
 
-Spherical cradle mount for a 59mm globe in FreeCAD 1.1.1.
-Cups the bottom 1/8 of the globe with a bottom nipple for a
-1/4" ID / 3/8" OD tube (glued slip fit).
+### Directory layout
 
-## FreeCAD Version
+```
+freecad/
+├── *.FCStd                      — current working sources, one file per part
+├── *.FCBak                      — FreeCAD auto-backups (not authoritative; only for recovery)
+├── drafts/                      — earlier/abandoned part iterations
+└── outdoor led final models/    — exported .3mf meshes used for slicing/printing
+```
+
+## FreeCAD Environment
 
 - FreeCAD 1.1.1 (stable, April 2026)
-- Workbench: Part (not Part Design)
+- Workbench: Part (not Part Design) — Part Design's revolution feature requires sketches entirely on one side of the revolution axis, and this project's spherical/cylindrical profiles cross the axis, so parts are built from Part-workbench booleans instead
 - Platform: macOS
 
-## Key Design Decisions
+### Boolean construction pattern
 
-### Why Part Workbench (not Part Design)
-Part Design revolution requires sketches entirely on one side of the
-revolution axis. The spherical profile crosses the axis causing errors.
-Part workbench boolean approach avoids this entirely.
+Parts are built by combining primitives (spheres/cylinders/boxes) with Boolean Cut and Union in sequence rather than sketch-based features — typically: cut inner from outer shape first (hollow shell), cut a box to crop it, union additional geometry (nipples, bosses, flanges), cut bores last. See [freecad.md](freecad.md) for each part's actual step-by-step sequence.
 
-### Construction Order (Critical)
-1. Cut inner sphere from outer sphere FIRST (hollow shell)
-2. Cut box from shell SECOND (crops to cradle shape)
-3. Union nipple cylinder THIRD
-4. Cut bore cylinder LAST
-
-### Mac-Specific Notes
-- Boolean operations: Click first object, Cmd+click second object
+### Mac-specific notes
+- Boolean operations: click first object, Cmd+click second object
 - Union: Part > Boolean > Union (not "Fuse")
 - Cut: Part > Boolean > Cut
 - TechDraw projection group centering via Python console:
   group.X = page.PageWidth / 2
   group.Y = page.PageHeight / 2
 
-## Critical Dimensions
+### Known issues / gotchas
 
-| Parameter           | Value    | Notes                     |
-|---------------------|----------|---------------------------|
-| Globe radius        | 29.5mm   | Must match actual globe   |
-| Inner cup radius    | 29.5mm   | Exact fit to globe        |
-| Outer cup radius    | 32mm     | 2.5mm wall thickness      |
-| Nipple bore radius  | 4.86mm   | Slip fit for 3/8" OD tube |
-| Nipple outer radius | 7.36mm   | 2.5mm wall around bore    |
-| Bore depth          | 15mm     | Glue surface area         |
-| Nipple length       | 20mm     | Total nipple protrusion   |
-| Box crop Z          | -22.1mm  | Sets cradle depth         |
-
-## Known Issues / Gotchas
-
-- TechDraw Projection Group X/Y properties do not update via Properties
-  panel — use Python console instead
-- Boolean Cut greyed out if objects are not proper closed solids
-- Use full sphere primitives (default angles) for boolean operations
-- Print preview print button nearly invisible on Mac
+- TechDraw Projection Group X/Y properties do not update via the Properties panel — use the Python console instead
+- Boolean Cut is greyed out if objects are not proper closed solids
+- Use full sphere/cylinder primitives (default angles) for boolean operations
+- Print preview's print button is nearly invisible on Mac
 - Use File > Print > Save as PDF (not File > Export > PDF) for 1:1 scale
 
-## Modifying the Design
-
-### To change globe size:
-1. Outer sphere radius = new_globe_radius + 2.5mm
-2. Inner sphere radius = new_globe_radius
-3. Box crop Z = -(new_globe_radius) + (new_globe_diameter / 8)
-4. Update README dimensions table
-
-### To change tube size:
-1. Nipple bore radius = (tube_OD / 2) + 0.1mm glue clearance
-2. Nipple outer radius = nipple_bore_radius + 2.5mm
-
-## FreeCAD Shortcuts (Mac)
+### FreeCAD shortcuts (Mac)
 
 | Action              | Shortcut        |
 |---------------------|-----------------|

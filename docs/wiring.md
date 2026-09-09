@@ -78,8 +78,9 @@ leaving the hub box. One 24V/300W PSU feeds two independent buck converters
   gate in, gate out → that zone's 300–470Ω resistor → underground data
   conductor. The four gates are electrically independent — no bussing
   between zones, same as the separate 12V/GND taps above.
-- This covers Phase 1 (4 zones) with room to spare on the chip; the second
-  74AHCT125 in CLAUDE.md's hardware list is for zones 5–8, not yet built.
+- This is the full build: the project is capped at 4 zones permanently
+  (hub box space constraints), so this single chip and the 4-port USB hub
+  cover the whole system — no second 74AHCT125 or expansion is planned.
 
 **USB (Pi ↔ Picos):**
 - Pi Zero 2 W → USB Hub + Ethernet HAT (stacks on GPIO header, taps Pi's USB
