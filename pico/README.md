@@ -138,12 +138,92 @@ For additional zones on the same chip, repeat with channel 2 (2A=pin5,
 (4A=pin12, 4Y=pin11, 4OE=pin13) — VCC/GND (pins 14/7) are shared across all
 four channels on the chip.
 
+## 5. Serial JSON protocol (main.py / effects.py / ws2811.py)
+
+These three files replace `test_bench.py` as the actual field firmware.
+They implement the JSON command protocol matching CLAUDE.md's MQTT
+payload schema, so a command received over serial has the same shape as
+what openHAB publishes to `garden/lights/zone/{n}/set`.
+
+- **`ws2811.py`** — thin wrapper around MicroPython's built-in
+  `neopixel.NeoPixel`, exactly as bench-validated in `test_bench.py`. Do
+  not modify without re-running that bench verification.
+- **`effects.py`** — `EffectRunner` holds the active effect
+  (`solid` | `cycle` | `chase` | `scene` | `off`) and its animation
+  state; `step()` is called once per loop iteration and internally
+  decides when to advance a frame. Also owns the internal `amber_pulse`
+  fail-safe (not part of the MQTT schema — used only when serial contact
+  is lost or a command fails to parse).
+- **`main.py`** — the lean serial loop: `uasyncio` runs three tasks —
+  `serial_listener()` (reads newline-delimited JSON off `sys.stdin` via
+  `asyncio.StreamReader`, dispatches to `EffectRunner.set_command()`),
+  `animate()` (calls `EffectRunner.step()` every 10ms), and `watchdog()`
+  (triggers the fail-safe if no valid command arrives within
+  `CONTACT_TIMEOUT_MS`, 15s by default).
+
+**`NUM_LEDS` in `main.py` is a placeholder (50)** — set it to this zone's
+actual fixture count before deploying to the field. It's per-file, not
+derived from the wire protocol, so it has to be edited per zone if zones
+differ in fixture count.
+
+**Deploy:**
+```bash
+mpremote connect /dev/ttyPICOn cp pico/ws2811.py :ws2811.py
+mpremote connect /dev/ttyPICOn cp pico/effects.py :effects.py
+mpremote connect /dev/ttyPICOn cp pico/main.py :main.py
+mpremote connect /dev/ttyPICOn reset
+```
+
+**`mpremote` always interrupts a running `main.py`.** Every `mpremote`
+command — `fs ls`, `exec`, even a failed one — sends Ctrl-C first to sync
+the REPL, which raises `KeyboardInterrupt` in whatever's running and
+drops the board to an idle REPL. It does **not** restart `main.py`
+afterward; the board just sits idle until you explicitly run `mpremote
+connect /dev/ttyPICOn reset`. So checking "is it running?" via any
+`mpremote` command is itself destructive — don't use it as a health
+check. After any `mpremote` session touches a port, always follow with
+`reset` before assuming the firmware is live again.
+
+**Never run `mpremote` against a port while `pi/bridge.py` has it open.**
+Both processes can technically open the same `/dev/ttyPICOn`, but the
+concurrent access causes `mpremote` to hang until it times out rather
+than fail cleanly — it looks like the board is unresponsive when it's
+actually just port contention. Stop `bridge.py` first, do the `mpremote`
+work, reset, then restart `bridge.py`.
+
+**Sending a test command** (what `pi/bridge.py` will eventually do via
+`pyserial-asyncio`) — a single newline-terminated JSON line to the port:
+```bash
+echo '{"effect":"solid","color":[0,255,0],"brightness":180}' > /dev/ttyPICOn
+```
+
+**Fail-safe:** malformed JSON, or 15s with no valid command, switches to
+a slow amber breathing pulse rather than going dark or crashing, per
+CLAUDE.md's fail-safe requirement.
+
+**Bench-tested 2026-09-16** on Fixture 1 (zone 1) with `NUM_LEDS=1`:
+`solid` and `cycle` confirmed working end-to-end (JSON → serial → parse →
+LED). The amber-pulse fail-safe was exercised but not conclusively
+confirmed visually — re-check before relying on it.
+
+**Update 2026-09-16 (later, all 4 zones + `pi/bridge.py`):** scaling to
+a real 5-fixture zone-1 string and all 4 zones surfaced two bugs the
+single-LED test above didn't catch — see
+[docs/wiring.md](../docs/wiring.md) Stage 1.5 for the full writeup:
+zones 2–4 had never actually been deployed with this firmware (still
+running the old `test_bench.py`, blocked forever at its `input()`
+prompt), and `ws2811.py` had a red/green channel swap (fixed — see its
+docstring). Full color test (red/green/blue/white) and all 4 zones now
+confirmed correct through `pi/bridge.py` end-to-end.
+
 ## Troubleshooting
 
-- **`mpremote ... TransportError: could not enter raw repl`** — the board
-  isn't running MicroPython. Either it still has different firmware from a
-  previous project, or the last flash was the wrong chip family (see step
-  0). Re-flash with the correct `.uf2`.
+- **`mpremote ... TransportError: could not enter raw repl`** — usually
+  means another process (most likely `pi/bridge.py`) already has that
+  port open; stop it and retry. If that's not it, the board may not be
+  running MicroPython at all (different firmware from a previous
+  project, or the last flash was the wrong chip family — see step 0);
+  re-flash with the correct `.uf2`.
 - **BOOTSEL drive never appears in `lsblk`** — BOOTSEL timing is finicky
   through a hub. Fully unplug, hold the button *before* plugging back in,
   hold for ~2s after, then release.
