@@ -23,6 +23,7 @@ class ZoneLink:
         self.port = port
         self.reader = None
         self.writer = None
+        self.last_payload = None
 
     async def connect(self):
         while self.writer is None:
@@ -36,6 +37,7 @@ class ZoneLink:
                 await asyncio.sleep(2)
 
     async def send(self, payload: dict):
+        self.last_payload = payload
         if self.writer is None:
             return
         try:
@@ -45,6 +47,16 @@ class ZoneLink:
             log.warning("zone %d: write failed, will reconnect", self.zone)
             self.reader = None
             self.writer = None
+
+    async def keepalive_loop(self):
+        """Repeat the last command so the Pico's contact watchdog doesn't
+        fire between openHAB commands. Not a decision, just a repeat —
+        the Pico ignores an identical command other than resetting its
+        watchdog."""
+        while True:
+            await asyncio.sleep(config.KEEPALIVE_INTERVAL_S)
+            if self.last_payload is not None:
+                await self.send(self.last_payload)
 
     async def status_loop(self, mqtt_client: aiomqtt.Client):
         topic = config.TOPIC_ZONE_STATUS.format(zone=self.zone)
@@ -70,41 +82,50 @@ def _zone_for_topic(topic, zones):
     return None
 
 
-async def run():
-    zones = {zone: ZoneLink(zone, port) for zone, port in config.ZONE_SERIAL_PORTS.items()}
-    for link in zones.values():
-        await link.connect()
-
+async def run(zones):
     async with aiomqtt.Client(config.MQTT_BROKER, port=config.MQTT_PORT) as client:
         await client.subscribe(config.TOPIC_ALL_SET)
         await client.subscribe(config.TOPIC_SCENE_SET)
         for zone in zones:
             await client.subscribe(config.TOPIC_ZONE_SET.format(zone=zone))
 
-        for link in zones.values():
-            asyncio.create_task(link.status_loop(client))
+        status_tasks = [asyncio.create_task(link.status_loop(client)) for link in zones.values()]
+        try:
+            await _forward(client, zones)
+        finally:
+            for task in status_tasks:
+                task.cancel()
 
-        async for message in client.messages:
-            try:
-                payload = json.loads(message.payload)
-            except (ValueError, TypeError):
-                log.warning("dropping malformed payload on %s", message.topic)
-                continue
 
-            topic = str(message.topic)
-            if topic in (config.TOPIC_ALL_SET, config.TOPIC_SCENE_SET):
-                await asyncio.gather(*(link.send(payload) for link in zones.values()))
-                continue
+async def _forward(client, zones):
+    async for message in client.messages:
+        try:
+            payload = json.loads(message.payload)
+        except (ValueError, TypeError):
+            log.warning("dropping malformed payload on %s", message.topic)
+            continue
 
-            zone = _zone_for_topic(topic, zones)
-            if zone is not None:
-                await zones[zone].send(payload)
+        topic = str(message.topic)
+        if topic in (config.TOPIC_ALL_SET, config.TOPIC_SCENE_SET):
+            await asyncio.gather(*(link.send(payload) for link in zones.values()))
+            continue
+
+        zone = _zone_for_topic(topic, zones)
+        if zone is not None:
+            await zones[zone].send(payload)
 
 
 async def main():
+    # Zone links (and their keepalives) outlive any one MQTT connection,
+    # so zones hold their last command through a broker restart.
+    zones = {zone: ZoneLink(zone, port) for zone, port in config.ZONE_SERIAL_PORTS.items()}
+    for link in zones.values():
+        await link.connect()
+        asyncio.create_task(link.keepalive_loop())
+
     while True:
         try:
-            await run()
+            await run(zones)
         except aiomqtt.MqttError:
             log.warning("MQTT connection lost, reconnecting in 5s")
             await asyncio.sleep(5)

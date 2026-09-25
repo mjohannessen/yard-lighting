@@ -1,0 +1,20 @@
+# systemd unit for pi/bridge.py. Install on the Pi:
+#   sudo cp /home/pi/yard-lighting/pi/garden-lights-bridge.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now garden-lights-bridge
+[Unit]
+Description=Garden lights MQTT<->serial bridge
+After=mosquitto.service network-online.target
+Wants=mosquitto.service network-online.target
+
+[Service]
+User=pi
+# dialout grants access to /dev/ttyPICOn
+SupplementaryGroups=dialout
+WorkingDirectory=/home/pi/yard-lighting/pi
+ExecStart=/home/pi/yard-lighting/pi/venv/bin/python -u bridge.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

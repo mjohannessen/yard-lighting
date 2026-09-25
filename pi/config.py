@@ -9,6 +9,11 @@ MQTT_PORT = 1883
 
 SERIAL_BAUD = 115200
 
+# Re-send each zone's last command this often. Must stay well under the
+# Pico's CONTACT_TIMEOUT_MS (15s in pico/main.py), or zones fall back to
+# the amber fail-safe pulse between openHAB commands.
+KEEPALIVE_INTERVAL_S = 5
+
 # Stable names from /etc/udev/rules.d/99-garden-picos.rules, not raw
 # /dev/ttyACMn (enumeration order can shift on reboot).
 ZONE_SERIAL_PORTS = {

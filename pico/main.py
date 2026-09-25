@@ -36,6 +36,9 @@ async def serial_listener():
             continue
         runner.set_command(cmd)
         last_contact_ms = time.ticks_ms()
+        # One status line per command received. The bridge's keepalive
+        # makes this a steady heartbeat on the zone's status topic.
+        print(ujson.dumps(runner.status()))
 
 
 async def watchdog():

@@ -82,6 +82,7 @@ pico/README.md        — MicroPython flashing + bench-test-stage setup guide
 pi/bridge.py          — asyncio MQTT↔serial bridge
 pi/config.py          — Zone→serial port mapping, MQTT broker address, topic prefixes
 pi/requirements.txt   — aiomqtt, pyserial-asyncio
+pi/garden-lights-bridge.service — systemd unit for bridge.py (install steps in its header)
 openhab/garden_lights.items
 openhab/garden_lights.rules
 openhab/garden_lights.sitemap

@@ -40,9 +40,16 @@ class EffectRunner:
         self.speed = 50
         self._offset = 0
         self._last_step_ms = time.ticks_ms()
+        self._last_cmd = None
         self.set_command({"effect": "off"})
 
     def set_command(self, cmd):
+        # The bridge re-sends the last command every few seconds as a
+        # keepalive. An identical repeat must not restart the animation
+        # (cycle/chase would visibly jump back to frame 0 each time).
+        if cmd == self._last_cmd:
+            return
+        self._last_cmd = cmd
         self.effect = cmd.get("effect", "off")
         self.color = tuple(cmd.get("color", (255, 255, 255)))
         self.brightness = cmd.get("brightness", 255)
@@ -72,6 +79,15 @@ class EffectRunner:
             "brightness": 255,
             "speed": 10,
         })
+
+    def status(self):
+        """Current state as a dict, for the zone's MQTT status topic."""
+        return {
+            "effect": self.effect,
+            "color": list(self.color),
+            "brightness": self.brightness,
+            "speed": self.speed,
+        }
 
     def _due(self, interval_ms):
         now = time.ticks_ms()

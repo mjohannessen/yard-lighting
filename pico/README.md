@@ -201,6 +201,17 @@ echo '{"effect":"solid","color":[0,255,0],"brightness":180}' > /dev/ttyPICOn
 a slow amber breathing pulse rather than going dark or crashing, per
 CLAUDE.md's fail-safe requirement.
 
+**Keepalive + status:** `pi/bridge.py` re-sends each zone's last command
+every `KEEPALIVE_INTERVAL_S` (5s, in `pi/config.py`) so the 15s watchdog
+only fires on a real outage, not between openHAB commands. `EffectRunner`
+ignores a command identical to the current one, so repeats don't restart
+`cycle`/`chase` animations. After every command it receives, the Pico
+prints one JSON status line (`effect`, `color`, `brightness`, `speed`),
+which the bridge publishes to `garden/lights/zone/{n}/status`. With the
+keepalive, that's a heartbeat every 5s per zone. Until a zone has received
+its first command after a bridge restart, it has nothing to repeat and
+falls back to amber after 15s.
+
 **Bench-tested 2026-09-16** on Fixture 1 (zone 1) with `NUM_LEDS=1`:
 `solid` and `cycle` confirmed working end-to-end (JSON → serial → parse →
 LED). The amber-pulse fail-safe was exercised but not conclusively
