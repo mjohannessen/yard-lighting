@@ -116,12 +116,15 @@ adjust the radius before committing to an ASA production run.
 
 ## Base Housing
 
-Weatherproof lower enclosure that sits at (not below) grade, holding the
+Weatherproof lower enclosure that sits flat on top of the ground, holding the
 30mm x 30mm x 10mm LED/fiber-alignment mount and the base of the stem.
 Pinned to the ground with common drip-irrigation metal loop stakes rather
 than buried, since burial was moved to the trunk cable only — the housing
-itself stays at the surface, exposed to sprinklers and rain but not
-flooding, and must be watertight since it contains the LED.
+itself stays on the surface, exposed to sprinklers and rain but not
+flooding, and must be watertight since it contains the LED. Bark mulch may
+be spread over the housing for looks (stem and globe stay clear), which
+keeps its floor and lower walls damp for days after each watering — see
+*Water protection* below.
 
 Design decisions locked in for this part, confirmed with the user
 2026-07-29:
@@ -136,7 +139,7 @@ Design decisions locked in for this part, confirmed with the user
   cutting the splices open and re-splicing, not unplug-and-swap. See the
   trade-off note there.
 - **Cylindrical puck** shape — simplest Part-workbench boolean sequence
-  (concentric cylinders), no corners to catch a mower/trimmer at grade.
+  (concentric cylinders), no corners to catch a mower/trimmer at ground level.
 - **Gel-filled direct-bury splice connectors at each of the two cable
   penetrations, spliced *outside* the housing, not through a bulkhead
   cutout.** Superseded 2026-08-27 — this section originally specified
@@ -152,9 +155,9 @@ Design decisions locked in for this part, confirmed with the user
   [docs/fixture_construction_fiber.md](docs/fixture_construction_fiber.md)
   §2 BOM), twist-on, no tool required. A coiled service loop of extra trunk
   cable at each box allows a future cut/re-splice without pulling new wire.
-  Servicing a fixture = dig down to the box, cut all splices open, lift the
-  box, splice in a replacement box's pigtails using the service loop's
-  slack, rebury. This still eliminates the lever-nut-inside-the-box splice
+  Servicing a fixture = lift the box, dig up the splices beneath it, cut
+  them open, splice in a replacement box's pigtails using the service
+  loop's slack, rebury the splices. This still eliminates the lever-nut-inside-the-box splice
   cavity from the earliest design — the splice just moved outside the box
   and changed connector technology twice since — see
   [docs/fixture_construction_fiber.md](docs/fixture_construction_fiber.md)
@@ -187,7 +190,7 @@ Design decisions locked in for this part, confirmed with the user
 
 | Feature                     | Dimension                        | Notes |
 |------------------------------|-----------------------------------|-------|
-| Overall shape                | Cylindrical puck                  | Sits flush at grade |
+| Overall shape                | Cylindrical puck                  | Sits flat on the ground surface, floor down |
 | Outer diameter                | 70mm                              | Shrunk from an earlier lever-nut-based draft (95mm) now that the node wires straight to pigtails with no in-box splice hardware — encloses the 30x30mm mount + pigtail dressing with margin |
 | Overall height                | 40mm                              | 30mm cup + 10mm cap, before final trim |
 | Wall thickness                 | 3mm                               | Thicker than the globe cradle's 2.5mm — this part carries stake-down load at the flanges |
@@ -263,22 +266,55 @@ and cap), same boolean-first approach as the globe cradle:
    against the tube
 5. Seat the cap onto the cup, tool the sealant fillets so water sheets off
    each joint rather than pooling; let cure per datasheet
-6. Bench-test the node before it ever goes in the ground
+6. Bench-test the node before it goes out to the garden
 
 ### Field Install / Service
 
 1. Strip the buried trunk cable's in/out ends and splice each to the
    corresponding pigtail leads with gel-filled direct-bury connectors
-   (ZONE INDUSTRY CORP, per BOM), outside the housing
-2. Coil a service loop of extra trunk cable near the box before
-   backfilling, so a future re-splice doesn't require pulling new wire
-3. Pin the housing to grade with a loop stake through each of the two
-   flange holes, prongs pushed fully into soil
-4. Confirm level and flush-to-grade seating, then backfill up to (not over)
-   the housing
-5. **To service a failed fixture**: dig down to the box, cut all splices
-   open, lift the box out, splice in a replacement box's pigtails using the
-   service loop's slack, rebury
+   (ZONE INDUSTRY CORP, per BOM), outside the housing. The pigtails leave
+   through the housing floor, so they run straight down into the ground
+   to the splices
+2. Coil a service loop of extra trunk cable beside the splices, then bury
+   the splices and loop, so a future re-splice doesn't require pulling new
+   wire
+3. Set the housing flat on the soil surface over the splice hole (not sunk
+   into it) and pin it with a loop stake through each of the two flange
+   holes, prongs pushed fully into soil
+4. Confirm it sits level, then spread bark mulch over the housing if
+   wanted, keeping the stem port and stem clear
+5. **To service a failed fixture**: pull back the mulch, unstake and lift
+   the box, dig up the splices beneath it, cut them open, splice in a
+   replacement box's pigtails using the service loop's slack, rebury the
+   splices
+
+### Water protection
+
+The housing sits on the surface, so water reaches it from sprinklers and
+rain, and bark mulch keeps its floor and lower walls wet long after. If
+water gets in, the 12V DC across the node's pads corrodes them within
+weeks, a wet 12V-to-DIN leak puts 12V on the data line, and the dead node
+blacks out every fixture downstream of it in the zone (BI/BO unwired). So:
+
+- **Coat the node.** After the bench test, brush conformal coating (or a
+  thin layer of the same clear silicone) over the WS2815's back, its pads
+  and the solder/heat-shrink joints, keeping the LED face clear for the
+  fiber. This is the main protection — the electronics survive a seal that
+  fails. The strip's own IP rating doesn't carry over once a single LED is
+  cut from it.
+- **Pot the pigtail floor bores**, not just a grommet: fill each bore around
+  the pigtail with silicone from inside the housing. The floor sits on damp
+  soil under mulch, so these are the most-exposed joints. Seal the cut end
+  of each pigtail's outer jacket inside the housing with adhesive-lined
+  heat-shrink so water can't creep along the conductors under the jacket.
+- **No weep hole.** A drain hole in a floor that sits on wet ground under
+  mulch lets water and insects in rather than out. The housing stays fully
+  sealed; the coating covers what condensation gets in.
+- **Keep the stem port shedding water.** Rain and sprinkler water run down
+  the stem to the compression grommet, the only upward-facing joint. Keep
+  mulch from piling against it so it isn't sitting wet.
+- **Aim sprinkler heads away from fixtures** where possible — a close-range
+  jet can force water past seals that rain never would.
 
 # Fiber Polishing Puck
 

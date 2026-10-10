@@ -4,7 +4,7 @@ This file provides context for Claude Code sessions on this project. Read it ful
 
 ## Project Purpose
 
-Distributed outdoor RGB LED garden lighting system. RP2350 Picos (Pico 2) drive WS2815 fixture nodes (wired single-line, WS2811-style — the chip's backup data feature is unused) via daisy-chained underground 3-wire trunk cable runs. Each fixture is a buried base enclosure (WS2815 node + direct-contact fiber pocket) feeding a passive fiber-optic + spring-wire stem up to a frosted globe — no electrical connection above the base enclosure. See [docs/fixture_construction_fiber.md](docs/fixture_construction_fiber.md) for the full fixture build. A Raspberry Pi Zero 2 W bridges MQTT (from openHAB on a Mac Mini) to USB serial commands for each Pico. All control hardware is co-located in a weatherproof hub box in the garden.
+Distributed outdoor RGB LED garden lighting system. RP2350 Picos (Pico 2) drive WS2815 fixture nodes (wired single-line, WS2811-style — the chip's backup data feature is unused) via daisy-chained underground 3-wire trunk cable runs. Each fixture is a base enclosure (WS2815 node + direct-contact fiber pocket) that sits flat on top of the ground, staked down, and may be covered with bark mulch for looks — only the trunk cable and its splices are buried (water protection for the enclosure: [freecad.md](freecad.md) §Water protection). Each enclosure feeds a passive fiber-optic + spring-wire stem up to a frosted globe — no electrical connection above the base enclosure. See [docs/fixture_construction_fiber.md](docs/fixture_construction_fiber.md) for the full fixture build. A Raspberry Pi Zero 2 W bridges MQTT (from openHAB on a Mac Mini) to USB serial commands for each Pico. All control hardware is co-located in a weatherproof hub box in the garden.
 
 ## Architecture Constraints — Do Not Change Without Discussion
 
@@ -88,7 +88,7 @@ openhab/garden_lights.rules
 openhab/garden_lights.sitemap
 docs/wiring.md                       — Bench-test-stage vs field-deployment wiring reference
 docs/fixture_construction_fiber.md   — Fixture head build guide: base enclosure, WS2815 node, fiber/spring-wire stem, globe
-docs/fixture_test_jig.md             — Pre-burial per-fixture bench test rig: clip leads onto pigtails before splicing/closing
+docs/fixture_test_jig.md             — Pre-install per-fixture bench test rig: clip leads onto pigtails before splicing/closing
 docs/fiber_polishing_jig.md          — LED-end fiber face prep jig: self-limiting polishing puck + cut/sand/polish procedure
 docs/bom.md                          — Bill of materials with sourcing notes
 freecad.md                           — Globe cradle + base housing part specs, dimensions, construction steps, as-built notes

@@ -76,7 +76,8 @@ mosquitto_sub -h 192.168.1.120 -v -t 'garden/lights/zone/+/status'
 
 Fixture heads use the fiber-optic flower-stem design in
 [docs/fixture_construction_fiber.md](docs/fixture_construction_fiber.md) — a
-buried base enclosure with a WS2815 node (used single-line, WS2811-style)
+base enclosure sitting flat on the ground (staked, optionally under bark
+mulch; only the trunk cable is buried) with a WS2815 node (used single-line, WS2811-style)
 feeding a flexible fiber-optic + spring-wire stem up to a passive frosted
 globe. The fiber's polished base end seats in direct contact against the
 node's flat SMD face — no reflector cone, no air gap. There is no rigid pipe
@@ -135,7 +136,7 @@ riser and no electrical connection above the base enclosure.
 
 ### Per-fixture base enclosure wiring
 
-Each fixture is a buried base enclosure (no rigid pipe riser) housing a
+Each fixture is a base enclosure sitting flat on the ground (no rigid pipe riser) housing a
 WS2815 node (LED holder insert, direct-contact fiber coupling) and the fixed
 end of the fiber/spring-wire stem. The node's leads are permanently soldered
 to two short pigtails at bench-assembly time, before the enclosure is ever

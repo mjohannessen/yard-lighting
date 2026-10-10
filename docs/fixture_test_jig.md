@@ -1,11 +1,11 @@
-# Fixture Test Jig — Pre-Burial Bench Test
+# Fixture Test Jig — Pre-Install Bench Test
 
 A standalone test rig for lighting up one fixture's WS2815 node — via its
 bare pigtail leads — before the base enclosure is glued shut and before the
 pigtails get spliced to trunk cable. This is what satisfies the "Node
 addresses and lights correctly on the bench" line in
 [docs/fixture_construction_fiber.md](fixture_construction_fiber.md) §6's
-pre-burial QC checklist, done right after Step 3 (pigtails soldered) or
+pre-install QC checklist, done right after Step 3 (pigtails soldered) or
 Step 4 (base assembled) — whichever point the enclosure is still open enough
 to reach the leads — and again at Step 9 after the globe is mounted.
 

@@ -166,8 +166,8 @@ independent buck converters — nothing downstream shares a raw 24V rail.
 ```
 24V/300W PSU
   │
-  ├─► 24V→12V buck (5A) ──► common 12V/GND bus ──► 4× IP67/68 3-pin connector
-  │                                                  └─► zone N trunk (12V + GND)
+  ├─► 24V→12V buck (5A) ──► common 12V/GND bus ──► 4× 2A fuse ──► 4× IP67/68 3-pin connector
+  │                                                                  └─► zone N trunk (12V + GND)
   │
   └─► 24V→5V buck (5A) ──► Pi Zero 2 W + USB Hub/Ethernet HAT
                               │
@@ -180,6 +180,12 @@ independent buck converters — nothing downstream shares a raw 24V rail.
 - **24V→12V buck, 5A** — all 4 WS2815 strings share this converter's output
   at a common bus in the hub box; each zone taps it through its own IP67/68
   connector, not a shared underground run.
+- **One 2A fuse per zone** (blade fuse or resettable PTC) between the 12V bus
+  and that zone's connector. A short in one zone — most likely a fixture
+  that took on water — then blows its own fuse instead of current-limiting
+  the shared 5A buck and darkening all four zones. 2A is several times a
+  5-fixture zone's worst-case draw; raise it if a zone grows past ~30
+  nodes, keeping it under the buck's 5A.
 - **24V→5V buck, 5A** — feeds the Pi Zero 2 W (via the stacked USB Hub +
   Ethernet HAT, GPIO 5V) and, through that hub's USB-A port, the powered USB
   hub. Picos draw 5V over VBUS from the powered USB hub's ports — they are
