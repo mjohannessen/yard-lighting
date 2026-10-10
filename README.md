@@ -2,6 +2,76 @@
 
 Distributed outdoor RGB LED garden lighting system. See [CLAUDE.md](CLAUDE.md) for the full architecture, hardware, and protocol spec.
 
+## Controlling the lights
+
+Lights are controlled by publishing JSON to MQTT topics on the Mosquitto
+broker running on the Pi (`192.168.1.120`, port 1883).
+[pi/bridge.py](pi/bridge.py) forwards each command over USB serial to the
+Pico for that zone. openHAB is the intended controller for schedules and
+scenes. For manual control or testing, use `mosquitto_pub` from any machine
+on the LAN.
+
+### Topics
+
+| Topic | Purpose |
+|---|---|
+| `garden/lights/zone/{n}/set` | Command one zone (`n` = 1–4) |
+| `garden/lights/all/set` | Send the same command to all four zones |
+| `garden/lights/scene/set` | Same as `all/set`; openHAB resolves the scene to a color first |
+| `garden/lights/zone/{n}/status` | The zone's current state, published by the Pico |
+
+### Command payload
+
+```json
+{"effect": "solid", "color": [255, 100, 0], "brightness": 128, "speed": 50}
+```
+
+| Field | Values | Default |
+|---|---|---|
+| `effect` | `solid`, `cycle` (rainbow), `chase` (one lit fixture moving down the string), `scene`, `off` | `off` |
+| `color` | `[r, g, b]`, 0–255 each; used by `solid`, `chase`, `scene` | `[255, 255, 255]` |
+| `brightness` | 0–255 | 255 |
+| `speed` | 0–100, for `cycle` and `chase` | 50 |
+
+Keep brightness well below full white in normal use, to manage node heat
+and power-supply headroom.
+
+### Examples
+
+```bash
+# Zone 1 warm white at half brightness
+mosquitto_pub -h 192.168.1.120 -t garden/lights/zone/1/set \
+  -m '{"effect":"solid","color":[255,180,100],"brightness":128}'
+
+# Slow rainbow on every zone
+mosquitto_pub -h 192.168.1.120 -t garden/lights/all/set \
+  -m '{"effect":"cycle","brightness":120,"speed":20}'
+
+# Everything off
+mosquitto_pub -h 192.168.1.120 -t garden/lights/all/set -m '{"effect":"off"}'
+
+# Watch every zone's status
+mosquitto_sub -h 192.168.1.120 -v -t 'garden/lights/zone/+/status'
+```
+
+### Status and fail-safe behavior
+
+- The bridge resends each zone's last command every 5 seconds, so each
+  zone publishes a status message (current `effect`, `color`, `brightness`,
+  `speed`) about every 5 seconds. If a zone's status stops, its Pico or the
+  bridge is down.
+- If a Pico receives no command for 15 seconds, it falls back to a slow
+  amber pulse. It never goes dark. This happens if the bridge or its USB
+  link is down, or after a bridge restart until the zone gets its next
+  command. Publish `set` commands with `-r` (retain) so the bridge picks up
+  the last command as soon as it reconnects.
+- The bridge runs as the systemd service `garden-lights-bridge` on the Pi:
+
+  ```bash
+  sudo systemctl restart garden-lights-bridge
+  journalctl -u garden-lights-bridge -f
+  ```
+
 ## Wiring
 
 Fixture heads use the fiber-optic flower-stem design in

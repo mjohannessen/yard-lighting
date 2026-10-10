@@ -89,6 +89,7 @@ openhab/garden_lights.sitemap
 docs/wiring.md                       — Bench-test-stage vs field-deployment wiring reference
 docs/fixture_construction_fiber.md   — Fixture head build guide: base enclosure, WS2815 node, fiber/spring-wire stem, globe
 docs/fixture_test_jig.md             — Pre-burial per-fixture bench test rig: clip leads onto pigtails before splicing/closing
+docs/fiber_polishing_jig.md          — LED-end fiber face prep jig: self-limiting polishing puck + cut/sand/polish procedure
 docs/bom.md                          — Bill of materials with sourcing notes
 freecad.md                           — Globe cradle + base housing part specs, dimensions, construction steps, as-built notes
 freecad/                             — FreeCAD sources (.FCStd), drafts/, and exported .3mf print files — see "FreeCAD Design Files" below

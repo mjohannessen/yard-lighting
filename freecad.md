@@ -279,3 +279,77 @@ and cap), same boolean-first approach as the globe cradle:
 5. **To service a failed fixture**: dig down to the box, cut all splices
    open, lift the box out, splice in a replacement box's pigtails using the
    service loop's slack, rebury
+
+# Fiber Polishing Puck
+
+Use #12-24 screw through side to retain fiber
+Fiber bore 3.53mm
+bottom inset .3mm deep, 6mm diameter
+30mmx30mmx20mm
+
+## Files
+
+No `.FCStd` source exists yet for this part — model it fresh from the
+Construction Method below; there's no earlier draft to reconcile against
+like the globe cradle's.
+
+## Construction Method
+
+Built in FreeCAD 1.1.1 using the Part workbench, same boolean-first
+approach as the other parts in this file:
+
+1. Outer cylinder, 15mm radius, 6mm height, coaxial with the global Z
+   axis → base disc blank
+2. Outer cylinder, 6mm radius, 10mm height, coaxial, stacked on top of the
+   base disc (z = 6 to 16mm) → collar blank
+3. Boolean Union: base disc + collar → puck blank (16mm overall height)
+4. Cylinder cut, 1.765mm radius (3.53mm dia), full height (through both
+   the base disc and the collar), coaxial with the blank → fiber bore
+5. Cone frustum cut, coaxial with the bore, sitting at the bottom face:
+   2.5mm radius at the bottom face tapering to 1.765mm radius (matching
+   the bore from step 4) over 0.3mm of height → bore exit chamfer, blended
+   into the straight bore rather than stepped
+6. Cylinder cut, 1.7mm radius (3.4mm dia), axis horizontal (perpendicular
+   to the puck's main axis), positioned 4mm below the collar's top face
+   (i.e. z ≈ 12mm), from one side of the collar's outer wall in to the
+   fiber bore → clamp screw clearance hole. The collar is only 12mm
+   across, so this only needs to travel ~4.2mm to hit the bore — nowhere
+   near the base disc's full 15mm radius
+7. At the same height, on the collar's opposite (far) side: a hex pocket
+   for an M3 nut, open at the collar's outer surface, ~2.6mm deep —
+   approximate the hex shape with two or three box cuts at 60° to each
+   other, same box+cylinder combination technique used for the Base
+   Housing's stake-flange holes. It opens outward, not inward, so the nut
+   can be dropped in from outside before final assembly
+8. Continue a second, smaller cylinder cut (same 1.7mm radius as step 6)
+   from the bottom of that hex pocket in to the fiber bore → pilot hole
+   connecting the nut trap to the bore, so the screw's shank has a
+   continuous path from the near-side clearance hole, across the bore,
+   through to the nut. Full span from the near-side clearance hole's outer
+   opening to the far side, through the nut, is ~11.8mm — inside the
+   M3x14mm screw's length with a couple mm to spare, so the screw doesn't
+   protrude past the collar's outer surface fully driven in
+9. Two shallow box cuts on the collar's outer wall, opposite each other →
+   grip flats
+
+## 3D Printing Notes
+
+- Print with the base disc's bottom (reference) face down against the
+  bed — this is the flattest surface FDM printing can give you, and it's
+  the face the whole jig depends on. The stepped base-disc-then-collar
+  shape sits stably in this orientation with no overhangs, so no supports
+  needed
+- The bore may print slightly undersized right at the first layer or two
+  from elephant's-foot squish; ream lightly with a 3.53mm drill bit by
+  hand if the fiber doesn't slide freely, same as the fiber holes in the
+  LED holder insert
+- Prototype in PLA on the Anycubic Kobra to confirm the fiber slip-fit and
+  clamp-screw/nut-trap engagement; print the puck kept on the bench
+  long-term in PETG — better abrasion and polish-compound resistance than
+  PLA for a part that gets wet-sanded against repeatedly
+- Layer height 0.2mm, 40%+ infill — no fine cosmetic features here, this
+  part just needs to be dimensionally solid and hold the nut trap under
+  clamp-screw torque
+- True the printed face flat before first use — see
+  [docs/fiber_polishing_jig.md](docs/fiber_polishing_jig.md)'s calibration
+  step; don't skip this even on a good-looking print
