@@ -1,2 +1,4 @@
 .DS_Store
 *.FCBak
+__pycache__/
+*.pyc
