@@ -201,6 +201,21 @@ Notes:
 | GND    | Common-tie gel-filled direct-bury connector, outside the base enclosure |
 | Data   | Two separate gel-filled connectors (in→DI, DO→out) — never a common tie, never mid-cable |
 
+### Fixture configuration
+
+#### Zone 1
+
+- 1 - Clear large
+- 2 - Clear small
+- 3 - White
+- 4 - White
+- 5 - White
+- 6 - Clear large
+- 7 - White
+- 8 - Clear small
+- 9 - White
+- 10 - Clear small
+
 ## 3D-printed parts
 
 The globe cradle and base enclosure are designed in FreeCAD; part specs,
