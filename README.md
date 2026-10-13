@@ -203,6 +203,10 @@ Notes:
 
 ### Fixture configuration
 
+Globes are clear or white. The LED is visible through a clear globe in
+daylight; a white globe is semi-opaque and hides it, so daytime checks only
+work on the clear fixtures.
+
 #### Zone 1
 
 - 1 - Clear large
