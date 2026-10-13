@@ -18,7 +18,7 @@ once and reuse it for every fixture.
 |---|---|
 | Pico 2 (RP2350) | Same board as the field build (CLAUDE.md architecture constraint) — running MicroPython, per [pico/README.md](../pico/README.md) |
 | 74AHCT125 quad level shifter | Only 1 of 4 channels used; same part as the field build and the bench-test rig ([pico/README.md](../pico/README.md) §4) |
-| 300–470Ω resistor | Data line, between the 74AHCT125's output and the node's DI clip lead — matches the field convention (CLAUDE.md *Per zone* table) |
+| 300–470Ω resistor | Data line, between the 74AHCT125's output and the node's DI clip lead — fine on the jig's short leads; the field build uses 100Ω because of its ~10 m trunk runs (CLAUDE.md *Per zone* table), and 100Ω works here too |
 | 100µF capacitor | Across the 12V/GND clip leads, as close to the node as the clips allow — cheap insurance against power-on surge into a single node, same reasoning as CLAUDE.md's *Known Constraints* note (protects the node on connection, when clip contact bounce can spike current briefly) |
 | 3× test clip leads (or fine hook probes) | 12V, GND, DI — clip directly to the fixture's bare pigtail leads. Use the **in-pigtail** (DI), never the out-pigtail (DO) — DO is the node's regenerated output toward the next fixture in the chain and carries no signal when nothing is driving it |
 | Bench power supply, 12V | Fixture LED power only — set the voltage before connecting, don't rely on the jig to protect against an unset/wrong supply voltage |

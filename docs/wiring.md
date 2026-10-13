@@ -39,7 +39,8 @@ the authoritative jig wiring, firmware, and use procedure. Power:
 - **300–470Ω data-line resistor** (74AHCT125 output → node DI clip lead)
   and **100µF capacitor** (across the 12V/GND clip leads at the node) —
   both now required and in place, matching the field convention (CLAUDE.md
-  *Per zone* table). With 5 real nodes in the chain, power-on inrush into
+  *Per zone* table), except that the field uses 100Ω: 300–470Ω is fine on
+  the bench's short leads but garbled the data over the field's ~10 m trunk. With 5 real nodes in the chain, power-on inrush into
   the first node is a real risk, unlike the earlier single-LED-on-GPIO
   test stage.
 - **Common ground across all supplies** — Pi/Pico GND, 74AHCT125 GND, and
@@ -173,7 +174,7 @@ independent buck converters — nothing downstream shares a raw 24V rail.
                               │
                               └─► powered USB hub ──► 4× Pico (VBUS 5V, GND, USB serial)
                                                          │
-                                                         └─► GP0 ──► 74AHCT125 gate ──► 300–470Ω resistor ──► zone N trunk (Data)
+                                                         └─► GP0 ──► 74AHCT125 gate ──► 100Ω resistor ──► zone N trunk (Data)
 ```
 
 **Power:**
@@ -193,7 +194,7 @@ independent buck converters — nothing downstream shares a raw 24V rail.
 
 **Signal — one 74AHCT125, 4 zones:**
 - All 4 gates of a single quad 74AHCT125 are used, one per Pico: Pico GP0 →
-  gate in, gate out → that zone's 300–470Ω resistor → underground data
+  gate in, gate out → that zone's 100Ω resistor → underground data
   conductor. The four gates are electrically independent — no bussing
   between zones, same as the separate 12V/GND taps above.
 - This is the full build: the project is capped at 4 zones permanently
@@ -206,15 +207,15 @@ independent buck converters — nothing downstream shares a raw 24V rail.
 |---|---|---|
 | 1 | 1OE | GND (tie low — zone 1 gate always enabled) |
 | 2 | 1A | Pico 1 GP0 |
-| 3 | 1Y | Zone 1 → 300–470Ω resistor → trunk data |
+| 3 | 1Y | Zone 1 → 100Ω resistor → trunk data |
 | 4 | 2OE | GND (tie low — zone 2 gate always enabled) |
 | 5 | 2A | Pico 2 GP0 |
-| 6 | 2Y | Zone 2 → 300–470Ω resistor → trunk data |
+| 6 | 2Y | Zone 2 → 100Ω resistor → trunk data |
 | 7 | GND | Common ground rail |
-| 8 | 3Y | Zone 3 → 300–470Ω resistor → trunk data |
+| 8 | 3Y | Zone 3 → 100Ω resistor → trunk data |
 | 9 | 3A | Pico 3 GP0 |
 | 10 | 3OE | GND (tie low — zone 3 gate always enabled) |
-| 11 | 4Y | Zone 4 → 300–470Ω resistor → trunk data |
+| 11 | 4Y | Zone 4 → 100Ω resistor → trunk data |
 | 12 | 4A | Pico 4 GP0 |
 | 13 | 4OE | GND (tie low — zone 4 gate always enabled) |
 | 14 | VCC | 5V rail (24V→5V buck output) |

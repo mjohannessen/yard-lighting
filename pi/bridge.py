@@ -117,10 +117,11 @@ async def _forward(client, zones):
 
 async def main():
     # Zone links (and their keepalives) outlive any one MQTT connection,
-    # so zones hold their last command through a broker restart.
+    # so zones hold their last command through a broker restart. Each
+    # zone's status_loop opens its own serial port, so an unplugged Pico
+    # doesn't stop the other zones from connecting.
     zones = {zone: ZoneLink(zone, port) for zone, port in config.ZONE_SERIAL_PORTS.items()}
     for link in zones.values():
-        await link.connect()
         asyncio.create_task(link.keepalive_loop())
 
     while True:

@@ -114,7 +114,7 @@ riser and no electrical connection above the base enclosure.
      │            it, one channel per zone)                │
      └────┬────────────┬────────────┬────────────┬────────┘
           ▼             ▼             ▼             ▼
-      300–470Ω      300–470Ω      300–470Ω      300–470Ω
+      100Ω          100Ω          100Ω          100Ω
       resistor on   resistor on   resistor on   resistor on
       zone 1 data   zone 2 data   zone 3 data   zone 4 data
       lead, at      lead, at      lead, at      lead, at

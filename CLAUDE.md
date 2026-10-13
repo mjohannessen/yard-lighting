@@ -43,7 +43,7 @@ Distributed outdoor RGB LED garden lighting system. RP2350 Picos (Pico 2) drive 
 - Full convention: [docs/fixture_construction_fiber.md](docs/fixture_construction_fiber.md) §5
 
 ### Per zone (in hub box)
-- 300–470Ω resistor on data line (at 74AHCT125 output, before underground cable)
+- 100Ω resistor on data line (at 74AHCT125 output, before underground cable). Not the usual 300–470Ω: with the ~10 m trunk to a zone's first fixture, 470Ω plus the cable's capacitance smeared the data edges enough that fixtures read random colours (diagnosed 2026-10-13: wire link and 100Ω both clean, 470Ω garbled). 100Ω still damps reflections on the long run and limits current into the 74AHCT125 if the data line ever faults.
 - 100µF capacitor across 12V/GND at the first base enclosure's node leads
 - IP67/IP68 3-pin weatherproof connector at hub box exit
 
