@@ -7,9 +7,11 @@ Distributed outdoor RGB LED garden lighting system. See [CLAUDE.md](CLAUDE.md) f
 Lights are controlled by publishing JSON to MQTT topics on the Mosquitto
 broker running on the Pi (`192.168.1.120`, port 1883).
 [pi/bridge.py](pi/bridge.py) forwards each command over USB serial to the
-Pico for that zone. openHAB is the intended controller for schedules and
-scenes. For manual control or testing, use `mosquitto_pub` from any machine
-on the LAN.
+Pico for that zone. openHAB turns all zones on in a rainbow cycle at dusk
+and off at 23:00 (house-brain's `GardenLights_Power`), and hauss-backend's
+`/garden.html` page controls them by hand. For testing, use
+`mosquitto_pub` from any machine on the LAN — the broker listens on the
+LAN via [pi/mosquitto-lan.conf](pi/mosquitto-lan.conf).
 
 ### Topics
 

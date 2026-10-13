@@ -161,10 +161,10 @@ what openHAB publishes to `garden/lights/zone/{n}/set`.
   (triggers the fail-safe if no valid command arrives within
   `CONTACT_TIMEOUT_MS`, 15s by default).
 
-**`NUM_LEDS` in `main.py` is a placeholder (50)** — set it to this zone's
-actual fixture count before deploying to the field. It's per-file, not
-derived from the wire protocol, so it has to be edited per zone if zones
-differ in fixture count.
+**`NUM_LEDS` in `main.py` is 10** — the fixture count of every zone (set
+2026-10-13; zone 1 is built with 10, the others are planned at 10). It's
+per-file, not derived from the wire protocol, so it has to be edited per
+zone if a zone ever differs.
 
 **Deploy:**
 ```bash

@@ -14,7 +14,7 @@ from ws2811 import Strip
 from effects import EffectRunner
 
 DATA_PIN = 0
-NUM_LEDS = 50  # set to this zone's actual fixture count before deployment
+NUM_LEDS = 10  # fixtures per zone (every zone is planned at 10)
 CONTACT_TIMEOUT_MS = 15_000  # no valid command this long -> fail-safe pulse
 
 strip = Strip(DATA_PIN, NUM_LEDS)

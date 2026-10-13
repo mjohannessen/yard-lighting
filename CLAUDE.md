@@ -83,9 +83,7 @@ pi/bridge.py          — asyncio MQTT↔serial bridge
 pi/config.py          — Zone→serial port mapping, MQTT broker address, topic prefixes
 pi/requirements.txt   — aiomqtt, pyserial-asyncio
 pi/garden-lights-bridge.service — systemd unit for bridge.py (install steps in its header)
-openhab/garden_lights.items
-openhab/garden_lights.rules
-openhab/garden_lights.sitemap
+pi/mosquitto-lan.conf — installed as /etc/mosquitto/conf.d/lan.conf on the Pi; without it Mosquitto 2.x only listens on localhost
 docs/wiring.md                       — Bench-test-stage vs field-deployment wiring reference
 docs/fixture_construction_fiber.md   — Fixture head build guide: base enclosure, WS2815 node, fiber/spring-wire stem, globe
 docs/fixture_test_jig.md             — Pre-install per-fixture bench test rig: clip leads onto pigtails before splicing/closing
@@ -94,6 +92,8 @@ docs/bom.md                          — Bill of materials with sourcing notes
 freecad.md                           — Globe cradle + base housing part specs, dimensions, construction steps, as-built notes
 freecad/                             — FreeCAD sources (.FCStd), drafts/, and exported .3mf print files — see "FreeCAD Design Files" below
 ```
+
+openHAB and web UI live in the parent house-brain repo and hauss-backend, not here: `openhab/conf/things/garden_lights.things` (a second broker bridge to 192.168.1.120), `items/garden_lights.items` (`GardenLights_Power` = rainbow cycle on all zones, `GardenLights_Effect`), the dusk/23:00 lines in `rules/astro.rules` / `rules/cron.rules`, and hauss-backend's `gardenController.js` + `public/garden.html` (`/garden/status`, `/garden/command`).
 
 ## Coding Conventions
 
