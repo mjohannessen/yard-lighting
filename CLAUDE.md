@@ -59,6 +59,7 @@ garden/lights/zone/{n}/set      # command a specific zone (n = 1–4)
 garden/lights/zone/{n}/status   # zone heartbeat / status
 garden/lights/all/set           # broadcast command to all zones
 garden/lights/scene/set         # activate a named scene
+garden/lights/pattern           # retained: rainbow | fireflies — what openHAB turns the lights on with (bridge ignores it)
 ```
 
 ### Command payload schema
@@ -93,7 +94,7 @@ freecad.md                           — Globe cradle + base housing part specs,
 freecad/                             — FreeCAD sources (.FCStd), drafts/, and exported .3mf print files — see "FreeCAD Design Files" below
 ```
 
-openHAB and web UI live in the parent house-brain repo and hauss-backend, not here: `openhab/conf/things/garden_lights.things` (a second broker bridge to 192.168.1.120), `items/garden_lights.items` (`GardenLights_Power` + `GardenLights_Pattern` `rainbow`/`fireflies`, sent to all zones by `rules/garden.rules`; `GardenLights_Effect`), the dusk/23:00 lines in `rules/astro.rules` / `rules/cron.rules`, and hauss-backend's `gardenController.js` + `public/garden.html` (`/garden/status`, `/garden/command`).
+openHAB and web UI live in the parent house-brain repo and hauss-backend, not here: `openhab/conf/things/garden_lights.things` (a second broker bridge to 192.168.1.120), `items/garden_lights.items` (`GardenLights_Power` + `GardenLights_Pattern` `rainbow`/`fireflies` on the retained `garden/lights/pattern`, sent to all zones by `rules/garden.rules`; `GardenLights_Effect`), the dusk/23:00 lines in `rules/astro.rules` / `rules/cron.rules`, and hauss-backend's `gardenController.js` + `public/garden.html` (`/garden/status`, `/garden/command`).
 
 ## Coding Conventions
 

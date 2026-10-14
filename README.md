@@ -20,6 +20,7 @@ LAN via [pi/mosquitto-lan.conf](pi/mosquitto-lan.conf).
 | `garden/lights/zone/{n}/set` | Command one zone (`n` = 1–4) |
 | `garden/lights/all/set` | Send the same command to all four zones |
 | `garden/lights/scene/set` | Same as `all/set`; openHAB resolves the scene to a color first |
+| `garden/lights/pattern` | Retained `rainbow` or `fireflies`: the pattern openHAB turns the lights on with. Set from openHAB or the hauss-backend garden page; the bridge ignores it |
 | `garden/lights/zone/{n}/status` | The zone's current state, published by the Pico |
 
 ### Command payload
