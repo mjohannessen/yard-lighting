@@ -1,11 +1,19 @@
 """
-Effect implementations (solid, cycle, chase, scene, off) plus the
+Effect implementations (solid, cycle, chase, fireflies, scene, off) plus the
 internal amber-pulse fail-safe. main.py owns the serial loop only — all
 per-effect animation state and stepping lives here.
 """
+import math
+import random
 import time
 
 AMBER = (255, 70, 0)
+
+# fireflies: each fixture flashes FIREFLY_FLASH_MS about every
+# FIREFLY_PERIOD_MS, jittered so the fixtures drift and never sync up
+FIREFLY_FLASH_MS = 500
+FIREFLY_PERIOD_MS = 10_000
+FIREFLY_JITTER_MS = 2_000
 
 
 def _scale(color, brightness):
@@ -66,8 +74,17 @@ class EffectRunner:
             # whatever color/brightness openHAB resolved it to.
             self.strip.fill(_scale(self.color, self.brightness))
             self.strip.write()
-        # cycle / chase / amber_pulse are animated: first frame drawn on
-        # the next step() call rather than here.
+        elif self.effect == "fireflies":
+            self.strip.fill((0, 0, 0))
+            self.strip.write()
+            now = time.ticks_ms()
+            n = self.strip.num_leds
+            # first flashes spread across one period, not all at once
+            self._ff_next = [time.ticks_add(now, random.randint(0, FIREFLY_PERIOD_MS)) for _ in range(n)]
+            self._ff_start = [None] * n
+            self._ff_hue = [random.randint(0, 255) for _ in range(n)]
+        # cycle / chase / fireflies / amber_pulse are animated: first frame
+        # drawn on the next step() call rather than here.
 
     def fail_safe(self):
         """Slow amber pulse — used when serial contact is lost or a
@@ -101,6 +118,8 @@ class EffectRunner:
             self._step_cycle()
         elif self.effect == "chase":
             self._step_chase()
+        elif self.effect == "fireflies":
+            self._step_fireflies()
         elif self.effect == "amber_pulse":
             self._step_amber_pulse()
         # solid / off / scene are static — nothing to do per frame.
@@ -125,6 +144,30 @@ class EffectRunner:
         self.strip[self._offset % n] = _scale(self.color, self.brightness)
         self.strip.write()
         self._offset += 1
+
+    def _step_fireflies(self):
+        if not self._due(20):
+            return
+        now = time.ticks_ms()
+        for i in range(self.strip.num_leds):
+            start = self._ff_start[i]
+            if start is None:
+                if time.ticks_diff(now, self._ff_next[i]) < 0:
+                    continue  # dark until its next flash
+                # new flash: a clearly different colour from this fixture's last
+                start = self._ff_start[i] = now
+                self._ff_hue[i] = (self._ff_hue[i] + random.randint(40, 216)) % 256
+                self._ff_next[i] = time.ticks_add(
+                    now, FIREFLY_PERIOD_MS + random.randint(-FIREFLY_JITTER_MS, FIREFLY_JITTER_MS))
+            t = time.ticks_diff(now, start)
+            if t >= FIREFLY_FLASH_MS:
+                self._ff_start[i] = None
+                self.strip[i] = (0, 0, 0)
+            else:
+                # smooth glow up and back down over the flash
+                level = math.sin(math.pi * t / FIREFLY_FLASH_MS)
+                self.strip[i] = _scale(wheel(self._ff_hue[i]), int(self.brightness * level))
+        self.strip.write()
 
     def _step_amber_pulse(self):
         if not self._due(30):

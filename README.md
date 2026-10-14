@@ -30,7 +30,7 @@ LAN via [pi/mosquitto-lan.conf](pi/mosquitto-lan.conf).
 
 | Field | Values | Default |
 |---|---|---|
-| `effect` | `solid`, `cycle` (rainbow), `chase` (one lit fixture moving down the string), `scene`, `off` | `off` |
+| `effect` | `solid`, `cycle` (rainbow), `chase` (one lit fixture moving down the string), `fireflies` (each fixture flashes a new random colour for 0.5 s about every 10 s, out of step with the others), `scene`, `off` | `off` |
 | `color` | `[r, g, b]`, 0–255 each; used by `solid`, `chase`, `scene` | `[255, 255, 255]` |
 | `brightness` | 0–255 | 255 |
 | `speed` | 0–100, for `cycle` and `chase` | 50 |

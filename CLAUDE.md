@@ -64,7 +64,7 @@ garden/lights/scene/set         # activate a named scene
 ### Command payload schema
 ```json
 {
-  "effect": "cycle",        // solid | cycle | chase | off | scene
+  "effect": "cycle",        // solid | cycle | chase | fireflies | off | scene
   "color": [255, 100, 0],   // RGB, 0–255 each
   "brightness": 128,        // 0–255
   "speed": 50               // effect speed, 0–100
@@ -75,7 +75,7 @@ garden/lights/scene/set         # activate a named scene
 
 ```
 pico/main.py          — MicroPython entry point, serial listener, effect dispatcher
-pico/effects.py       — Effect implementations (solid, cycle, chase, scene, off)
+pico/effects.py       — Effect implementations (solid, cycle, chase, fireflies, scene, off)
 pico/ws2811.py        — NeoPixel-protocol driver, used for WS2815 in single-line mode (do not modify)
 pico/test_bench.py    — Bench-test-stage smoke test (2 LEDs, no serial protocol)
 pico/README.md        — MicroPython flashing + bench-test-stage setup guide
@@ -93,7 +93,7 @@ freecad.md                           — Globe cradle + base housing part specs,
 freecad/                             — FreeCAD sources (.FCStd), drafts/, and exported .3mf print files — see "FreeCAD Design Files" below
 ```
 
-openHAB and web UI live in the parent house-brain repo and hauss-backend, not here: `openhab/conf/things/garden_lights.things` (a second broker bridge to 192.168.1.120), `items/garden_lights.items` (`GardenLights_Power` = rainbow cycle on all zones, `GardenLights_Effect`), the dusk/23:00 lines in `rules/astro.rules` / `rules/cron.rules`, and hauss-backend's `gardenController.js` + `public/garden.html` (`/garden/status`, `/garden/command`).
+openHAB and web UI live in the parent house-brain repo and hauss-backend, not here: `openhab/conf/things/garden_lights.things` (a second broker bridge to 192.168.1.120), `items/garden_lights.items` (`GardenLights_Power` + `GardenLights_Pattern` `rainbow`/`fireflies`, sent to all zones by `rules/garden.rules`; `GardenLights_Effect`), the dusk/23:00 lines in `rules/astro.rules` / `rules/cron.rules`, and hauss-backend's `gardenController.js` + `public/garden.html` (`/garden/status`, `/garden/command`).
 
 ## Coding Conventions
 
