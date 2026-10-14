@@ -12,8 +12,8 @@ AMBER = (255, 70, 0)
 # fireflies: each fixture flashes FIREFLY_FLASH_MS about every
 # FIREFLY_PERIOD_MS, jittered so the fixtures drift and never sync up
 FIREFLY_FLASH_MS = 500
-FIREFLY_PERIOD_MS = 10_000
-FIREFLY_JITTER_MS = 2_000
+FIREFLY_PERIOD_MS = 5_000
+FIREFLY_JITTER_MS = 1_000
 
 
 def _scale(color, brightness):
